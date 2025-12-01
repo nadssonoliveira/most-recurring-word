@@ -1,4 +1,3 @@
-extern strcpy
 extern printf
 extern fgets
 extern stdin
