@@ -1,4 +1,4 @@
-extern printf
+extern printf, strcpy
 extern fgets
 extern stdin
 
@@ -71,6 +71,8 @@ inner_loop:
     mov rsi, r10 ; palavra atual
     mov rdi, r11 ; palavra a comparar
 
+
+; comparando caracter por caracter
 compare:
     mov dl, [rsi]
     mov cl, [rdi]
@@ -89,9 +91,11 @@ compare:
     inc rdi
     jmp compare
 
+; incrementa o contador
 equal:
     inc rax ; incrementa contador
 
+; pula para a próxima palavra 
 not_equal:
     ; pula para a próxima palavra
     cmp byte [r11], ' '
@@ -104,9 +108,12 @@ not_equal:
     inc r11
     jmp not_equal
 
+; pula espaços
 inner_skip
     inc r11
     jmp inner_loop
+
+; atualiza contador e melhor palavra
 inner_end:
     ; comparando contador atual com o maior
     cmp rax, rbx 
@@ -115,6 +122,7 @@ inner_end:
     mov rbx, rax ; atualiza maior contagem
     mov r9, r10  ; salva melhor palavra
 
+; atualiza r8 para próxima palavra
 count:
     ; Avança r8 até a próxima palavra
     cmp byte [r8], ' '
@@ -127,14 +135,13 @@ count:
     inc r8
     jmp count
 
+; pula espaços até o inicio da proxima palavra 
 skip:
     inc r8
     jmp main_token_loop
 done:
     mov rsi, r9
-    mov rdi, best
-
-copy_word:
+find_end:
     mov al, [rsi]
     cmp al, ' '
     je done_copy
@@ -143,11 +150,15 @@ copy_word:
     cmp al, 0
     je done_copy
 
-    mov [rdi], al
     inc rsi
-    inc rdi
     jmp copy_word
 done_copy:
+    mov byte [rsi], 0
+
+    ; copiar a melhor palavra para best
+    mov rdi, best
+    mov rsi, r9
+    call strcpy
 
     mov rdi, best_word
     mov rsi, best
